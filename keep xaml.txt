@@ -1,0 +1,97 @@
+<Page
+    x:Class="PictureShow.MainPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:PictureShow"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d">
+
+    <Grid Background="{StaticResource ApplicationPageBackgroundThemeBrush}">
+        <ScrollViewer>
+            <ItemsControl x:Name="mainImage">
+                 <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <Border>
+                            <Grid>
+                                <Image Source="{Binding BMImage}" 
+                                   Stretch="UniformToFill" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
+                          ManipulationCompleted="mainImage_ManipulationCompleted"
+                          ManipulationMode="System,TranslateX,TranslateY" />
+                                <TextBlock Text="{Binding FullName}" FontFamily="Global User Interface" FontSize="32"/>
+                            </Grid>
+                        </Border>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </ScrollViewer>
+    </Grid>
+    <Page.TopAppBar>
+        <AppBar>
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <Button Style="{StaticResource OpenFileAppBarButtonStyle}"
+                            Click="Button_Click" />
+                <GridView x:Name="imageHeads"
+                            Grid.Column="1"
+                            IsItemClickEnabled="False"
+                            SelectionMode="Single"
+                            VerticalAlignment="Center"
+                            Tapped="OnTopItemTapped">
+                    <GridView.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <VirtualizingStackPanel Height="138" Orientation="Horizontal" />
+                        </ItemsPanelTemplate>
+                    </GridView.ItemsPanel>
+                    <GridView.ItemTemplate>
+                        <DataTemplate>
+                            <Border>
+                                <Grid>
+                                    <Image Source="{Binding BMImage}" 
+                                       Height="138" 
+                                       Width="200" 
+                                       Stretch="UniformToFill" />
+                                    <TextBlock Text="{Binding Series}" Opacity="0.5"/>
+                                </Grid>
+                            </Border>
+                        </DataTemplate>
+                    </GridView.ItemTemplate>
+                </GridView>
+            </Grid>
+        </AppBar>
+    </Page.TopAppBar>
+    <Page.BottomAppBar>
+        <AppBar>
+            <Grid>
+                <GridView x:Name="imageGroups"
+                            Grid.Column="1"
+                            IsItemClickEnabled="False"
+                            SelectionMode="Single"
+                            VerticalAlignment="Center"
+                            Tapped="OnBottomItemTapped">
+                    <GridView.ItemsPanel>
+                       <ItemsPanelTemplate>
+                            <VirtualizingStackPanel Height="138" Orientation="Horizontal" />
+                        </ItemsPanelTemplate>
+                    </GridView.ItemsPanel>
+                    <GridView.ItemTemplate>
+                        <DataTemplate>
+                            <Border>
+                                <Grid>
+                                    <Image Source="{Binding BMImage}" 
+                                       Height="138" 
+                                       Width="200" 
+                                       Stretch="UniformToFill" />
+                                    <TextBlock Text="{Binding SeriesNumberTag}" Opacity="0.5"/>
+                                </Grid>
+                            </Border>
+                        </DataTemplate>
+                    </GridView.ItemTemplate>
+                </GridView>
+            </Grid>
+        </AppBar>
+    </Page.BottomAppBar>
+</Page>
