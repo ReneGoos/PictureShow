@@ -18,10 +18,10 @@
                 <ItemsControl.ItemTemplate>
                     <DataTemplate>
                         <Canvas Name="canvasView"  Height="{Binding Height}" Width="{Binding Width}">
-                            <Grid Name="gridView" Height="{Binding Height}" Width="{Binding Width}" 
+                            <Grid Name="listView" Height="{Binding Height}" Width="{Binding Width}" 
                                   Tapped="gridView_Tapped"
                           ManipulationCompleted="mainImage_ManipulationCompleted"
-                          ManipulationMode="System,TranslateX">
+                          ManipulationMode="TranslateX, TranslateY">
                                 <Image Source="{Binding BMImage}"/>
                                 <TextBlock Text="{Binding FileName}" FontFamily="Global User Interface" FontSize="32"/>
                             </Grid>
@@ -40,19 +40,24 @@
                 </Grid.ColumnDefinitions>
                 <Button Style="{StaticResource OpenFileAppBarButtonStyle}"
                             Click="Button_Click" />
-                <GridView x:Name="imageHeads"
+                <ListView x:Name="imageHeads"
                             Grid.Column="1"
                             IsItemClickEnabled="False"
                             SelectionMode="Single"
+                            ScrollViewer.HorizontalScrollBarVisibility="Auto"
+                            ScrollViewer.VerticalScrollBarVisibility="Disabled"
+                            ScrollViewer.HorizontalScrollMode="Enabled"
+                            ScrollViewer.VerticalScrollMode="Disabled"
+                            ScrollViewer.ZoomMode="Disabled"
                             VerticalAlignment="Center"
                             Tapped="OnTopItemTapped"
                             VirtualizingStackPanel.VirtualizationMode="Recycling">
-                    <GridView.ItemsPanel>
+                    <ListView.ItemsPanel>
                         <ItemsPanelTemplate>
                             <VirtualizingStackPanel Height="138" Orientation="Horizontal" />
                         </ItemsPanelTemplate>
-                    </GridView.ItemsPanel>
-                    <GridView.ItemTemplate>
+                    </ListView.ItemsPanel>
+                    <ListView.ItemTemplate>
                         <DataTemplate>
                             <Border>
                                 <Grid>
@@ -66,27 +71,32 @@
                                 </Grid>
                             </Border>
                         </DataTemplate>
-                    </GridView.ItemTemplate>
-                </GridView>
+                    </ListView.ItemTemplate>
+                </ListView>
             </Grid>
         </AppBar>
     </Page.TopAppBar>
     <Page.BottomAppBar>
         <AppBar>
             <Grid>
-                <GridView x:Name="imageGroups"
+                <ListView x:Name="imageGroups"
                             Grid.Column="1"
                             IsItemClickEnabled="False"
                             SelectionMode="Single"
+                            ScrollViewer.HorizontalScrollBarVisibility="Auto"
+                            ScrollViewer.VerticalScrollBarVisibility="Disabled"
+                            ScrollViewer.HorizontalScrollMode="Enabled"
+                            ScrollViewer.VerticalScrollMode="Disabled"
+                            ScrollViewer.ZoomMode="Disabled"
                             VerticalAlignment="Center"
                             Tapped="OnBottomItemTapped"
                             VirtualizingStackPanel.VirtualizationMode="Recycling">
-                    <GridView.ItemsPanel>
+                    <ListView.ItemsPanel>
                         <ItemsPanelTemplate>
                             <VirtualizingStackPanel Height="138" Orientation="Horizontal" />
                         </ItemsPanelTemplate>
-                    </GridView.ItemsPanel>
-                    <GridView.ItemTemplate>
+                    </ListView.ItemsPanel>
+                    <ListView.ItemTemplate>
                         <DataTemplate>
                             <Border>
                                 <Grid>
@@ -100,8 +110,8 @@
                                 </Grid>
                             </Border>
                         </DataTemplate>
-                    </GridView.ItemTemplate>
-                </GridView>
+                    </ListView.ItemTemplate>
+                </ListView>
             </Grid>
         </AppBar>
     </Page.BottomAppBar></Page>

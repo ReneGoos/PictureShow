@@ -21,130 +21,55 @@ namespace PictureLib
 	/// </summary>
     public class PageFile
     {
-        private StorageFile isFullName = null;//, isName = "", isPath = "";
-		private string isSeries = "", isSeriesNumber = "";
-        private int iiNumber = -1;
-        private int iiCurrent = -1;
-        private PageFile ipPrev = null, ipNext = null;
-        private Book ibParent = null;
-
         public PageFile(StorageFile asFileName, String asSeries, String asSeriesNumber, int aiNumber, Book abParent, PageFile apPrev)
             : base()
         {
             UniqueId = asFileName.Path;
 
-            isFullName = asFileName;
+            File = asFileName;
 
-            ibParent = abParent;
-            ipPrev = abParent.Last;
-            if (ipPrev == null)
+            Book = abParent;
+            Previous = abParent.Last;
+            if (Previous == null)
             {
-                iiCurrent = 1;
-                ipPrev = apPrev;
+                Current = 1;
+                Previous = apPrev;
             }
             else
             {
-                iiCurrent = ipPrev.iiCurrent + 1;
-                Debug.Assert(apPrev == ipPrev);
+                Current = Previous.Current + 1;
+                Debug.Assert(apPrev == Previous);
             }
 
-            if (ipPrev != null)
-                ipPrev.Next = this;
+            if (Previous != null)
+                Previous.Next = this;
             abParent.Last = this;
 
-            isSeries = asSeries;
-            isSeriesNumber = asSeriesNumber;
-            iiNumber = aiNumber;
+            Series = asSeries;
+            SeriesNumberTag = asSeriesNumber;
+            Number = aiNumber;
         }
 
         public string UniqueId { get; set; }
 
-        public string Series
-		{
-			get
-			{
-				return isSeries;
-			}
-		}
+        public Book Book { get; }
 
-		public int Number
-		{
-			get
-			{
-				return iiNumber;
-			}
-		}
+        public string Series { get; } = "";
 
-        public int Current
-        {
-            get
-            {
-                return iiCurrent;
-            }
-        }
+        public int Number { get; } = -1;
 
-        public PageFile Next
-        {
-            get
-            {
-                return ipNext;
-            }
-            protected set
-            {
-                ipNext = value;
-            }
-        }
+        public int Current { get; } = -1;
 
-        public PageFile Previous
-        {
-            get
-            {
-                return ipPrev;
-            }
-            protected set 
-            {
-                ipPrev = value;
-            }
-        }
+        public PageFile Next { get; protected set; } = null;
+        public PageFile Previous { get; protected set; } = null;
 
-        public int Total
-        {
-            get
-            {
-                return ibParent.Last.Current;
-            }
-        }
+        public int Total => Book.Last.Current;
 
-		public string SeriesNumberTag
-		{
-			get
-			{
-				return isSeriesNumber;
-			}
-		}
+        public string SeriesNumberTag { get; } = "";
+        public StorageFile File { get; } = null;
 
-        public StorageFile File
-        {
-            get
-            {
-                return isFullName;
-            }
-        }
+        public string FullName => File.Path;
 
-        public string FullName
-        {
-            get
-            {
-                return isFullName.Path;
-            }
-        }
-
-        public string FileName
-        {
-            get
-            {
-                return isFullName.DisplayName;
-            }
-        }
-	}
+        public string FileName => File.DisplayName;
+    }
 }

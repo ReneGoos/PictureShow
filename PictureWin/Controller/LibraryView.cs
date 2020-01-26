@@ -38,7 +38,7 @@ namespace PictureWin.Controller
             return lPic;
         }
 
-        private static async Task PicturesLoad(List<PageFile> lPic, GridView imageFiles)
+        private static async Task PicturesLoad(List<PageFile> lPic, ListView imageFiles)
         {
             //Pictures lPics = lPic[26].Items[1].Items[0].Value;
             // load file from document library. Note: select document library in capabilities and declare .png file type
@@ -95,13 +95,13 @@ namespace PictureWin.Controller
         public static async Task LoadTopGrid(BookShelf asPic, ItemsControl agvImages)
         {
             agvImages.Items.Clear();
-            await PicturesLoad(asPic.Files, agvImages as GridView);
+            await PicturesLoad(asPic.Files, agvImages as ListView);
         }
 
         public static async Task LoadBottomGrid(BookShelf asPic, string series, ItemsControl agvImages)
         {
             agvImages.Items.Clear();
-            await PicturesLoad(asPic[series].Files, agvImages as GridView);
+            await PicturesLoad(asPic[series].Files, agvImages as ListView);
         }
 
         public static async Task LoadNewPicture(BookShelf asPic, string series, string seriesNumber, ItemsControl agvImages)

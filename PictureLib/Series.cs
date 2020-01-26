@@ -12,13 +12,18 @@ namespace PictureLib
         Dictionary<string, Book> mlsPictures;
         private BookShelf mbsLocation = null;
 
-        public Series(string sSeriesName, BookShelf sfLocation)
+        private Series _previous;
+        private Series _next;
+
+
+        public Series(string sSeriesName, BookShelf sfLocation, Series previous)
             : base()
         {
             UniqueId = sfLocation.UniqueId + "+" + sSeriesName;
             Name = sSeriesName;
             mbsLocation = sfLocation;
             mlsPictures = new Dictionary<string, Book>();
+            Previous = previous;
         }
 
         public string UniqueId { get; set; }
@@ -36,6 +41,27 @@ namespace PictureLib
             {
                 if (!mlsPictures.ContainsKey(sBook))
                     mlsPictures[sBook] = value;
+            }
+        }
+
+        public Series Previous
+        {
+            get => _previous;
+            protected set
+            {
+                _previous = value;
+                if (_previous != null)
+                    _previous.Next = this;
+            }
+        }
+
+        public Series Next
+        {
+            get => _next;
+
+            protected set
+            {
+                _next = value;
             }
         }
 

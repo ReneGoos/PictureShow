@@ -24,11 +24,11 @@ namespace PictureLib
 
         public Series this[string sName]
         {
-            get
+            get => mlsPictures[sName];
+            set
             {
                 if (!mlsPictures.ContainsKey(sName))
-                    mlsPictures[sName] = new Series(sName, this);
-                return mlsPictures[sName];
+                    mlsPictures[sName] = value;
             }
         }
 

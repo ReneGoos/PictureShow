@@ -13,9 +13,8 @@ namespace PictureLib
     {
         private static Library _Series = new Library();
         private static Dictionary<string, BookShelf> mlsSeries = new Dictionary<string, BookShelf>();
-        private static String _ActiveSet = null;
 
-        public Library() : base()
+        public Library()
         {
         }
 
@@ -119,13 +118,14 @@ namespace PictureLib
             fileTypeFilter.Add(".gif");
             fileTypeFilter.Add(".tif");
 
-            QueryOptions queryOptions = new Windows.Storage.Search.QueryOptions(CommonFileQuery.OrderByName, fileTypeFilter);
+            QueryOptions queryOptions = new QueryOptions(CommonFileQuery.OrderByName, fileTypeFilter);
             queryOptions.FolderDepth = FolderDepth.Shallow;
-            string sPrevSeries = "some series name you'll never expect to see", sPrevSeriesNumber = "some series number tag you'll never expect to see";
+            string sPrevSeries = "some series name you'll never expect to see", sPrevBook = "some series number tag you'll never expect to see";
             StorageFileQueryResult queryResults = sfFolder.CreateFileQueryWithOptions(queryOptions);
             //IReadOnlyList<StorageFile> lsFiles = await queryResults.GetFilesAsync();
 
             string sSeries, sBook;
+            Series seriesThis = null;
             Book bkThis = null;
             PageFile pfLast = null;
             int iNumber = 0;
@@ -135,14 +135,20 @@ namespace PictureLib
                 //StorageFile fiFile = lsFiles[ifile];
                 string sName = fiFile.Name;         // fiFile.Path.Substring(sfFolder.Path.Length);
                 ParseName(sName, out sSeries, out sBook, out iNumber);
-                
-                if (String.Compare(sSeries, sPrevSeries, StringComparison.OrdinalIgnoreCase) != 0 ||
-                    String.Compare(sBook, sPrevSeriesNumber, StringComparison.OrdinalIgnoreCase) != 0)
+
+                if (String.Compare(sSeries, sPrevSeries, StringComparison.OrdinalIgnoreCase) != 0)
                 {
-                    bkThis = new Book(sSeries, sBook, spWork[sSeries]);
+                    seriesThis = new Series(sSeries, spWork, seriesThis);
+                    spWork[sSeries] = seriesThis;
+                }
+
+                if (String.Compare(sSeries, sPrevSeries, StringComparison.OrdinalIgnoreCase) != 0 ||
+                    String.Compare(sBook, sPrevBook, StringComparison.OrdinalIgnoreCase) != 0)
+                {
+                    bkThis = new Book(sSeries, sBook, spWork[sSeries], bkThis);
                     spWork[sSeries][sBook] = bkThis;
                     sPrevSeries = sSeries;
-                    sPrevSeriesNumber = sBook;
+                    sPrevBook = sBook;
                 }
 
                 PageFile pcfFile = new PageFile(fiFile, sSeries, sBook, iNumber, bkThis, pfLast);
@@ -286,7 +292,7 @@ namespace PictureLib
 
         public static async Task<BookShelf> GetSerieSets(StorageFolder sf)
         {
-            _ActiveSet = sf.Path;
+            ActiveSet = sf.Path;
             if (!mlsSeries.ContainsKey(sf.Path))
             {
                 await FolderInSeries(sf);
@@ -296,19 +302,13 @@ namespace PictureLib
 
         public static async Task<BookShelf> GetSerieSets(string sfFolder)
         {
-            _ActiveSet = sfFolder;
+            ActiveSet = sfFolder;
             StorageFolder sf = await StorageFolder.GetFolderFromPathAsync(sfFolder);
             await GetSerieSets(sf);
             return mlsSeries[sf.Path];
         }
 
-        public static string ActiveSet
-        {
-            get
-            {
-                return _ActiveSet;
-            }
-        }
+        public static string ActiveSet { get; private set; } = null;
 
         //public static List<PictureSets> GetListPictureSets(List<SeriesPictures> sSeries, string sName)
         //{
@@ -327,7 +327,7 @@ namespace PictureLib
         //    if (spThis == null)
         //        return null;
         //    PictureSets psFound = null;
-            
+
         //    foreach (PictureSets psThis in spThis)
         //        if (psThis.Items[0].Key.Equals(sNumber, StringComparison.OrdinalIgnoreCase))
         //            psFound = psThis;

@@ -1,4 +1,5 @@
 ﻿using PictureLib;
+using PictureWin.Common;
 using PictureWin.Controller;
 using System;
 using System.Collections.Generic;
@@ -105,16 +106,16 @@ namespace PictureWin
 
         private async void OnTopItemTapped(object sender, TappedRoutedEventArgs e)
         {
-            var gridView = sender as GridView;
-            var pagePic = gridView.SelectedItem as PagePicture;
+            var listView = sender as ListView;
+            var pagePic = listView.SelectedItem as PagePicture;
             await LibraryView.LoadBottomGrid(mlPic, pagePic.Series, imageGroups);
             await LibraryView.LoadNewPicture(mlPic, pagePic.Series, pagePic.SeriesNumberTag, mainImage);
         }
 
         private async void OnBottomItemTapped(object sender, TappedRoutedEventArgs e)
         {
-            var gridView = sender as GridView;
-            var pagePic = gridView.SelectedItem as PagePicture;
+            var listView = sender as ListView;
+            var pagePic = listView.SelectedItem as PagePicture;
             await LibraryView.LoadNewPicture(mlPic, pagePic.Series, pagePic.SeriesNumberTag, mainImage);
         }
 
@@ -157,16 +158,34 @@ namespace PictureWin
 
         private async void mainImage_ManipulationCompleted(object sender, ManipulationCompletedRoutedEventArgs e)
         {
-            if (Math.Abs(e.Velocities.Linear.X) > .1)
+            if (Math.Abs(e.Velocities.Linear.X) > .1 || Math.Abs(e.Velocities.Linear.Y) > .1)
             {
                 PagePicture lpCurrent = (PagePicture)mainImage.Items[0];
                 PageFile lpfFile = null;
                 if (lpCurrent != null)
                 {
-                    if (e.Velocities.Linear.X > 0)//500 is the threshold value, where you want to trigger the swipe right event
-                        lpfFile = StepPrevious((e.Velocities.Linear.X > 2), lpCurrent);
-                    else if (e.Velocities.Linear.X < 0)
-                        lpfFile = StepNext((e.Velocities.Linear.X < -2), lpCurrent);
+                    var step = StepSize.small;
+                    var directionUp = true;
+
+                    if (Math.Abs(e.Velocities.Linear.X) > Math.Abs(e.Velocities.Linear.Y))
+                    {
+                        directionUp = (e.Velocities.Linear.X < 0);
+                        if (Math.Abs(e.Velocities.Linear.X) > 2)
+                            step = StepSize.large;
+                    }
+                    else
+                    {
+                        directionUp = (e.Velocities.Linear.Y < 0);
+                        if (Math.Abs(e.Velocities.Linear.Y) > 2)
+                            step = StepSize.series;
+                        else
+                            step = StepSize.seriesTag;
+                    }
+
+                    if (directionUp)
+                        lpfFile = lpCurrent.StepNext(step);
+                    else
+                        lpfFile = lpCurrent.StepPrevious(step);
 
                     if (lpfFile != null)
                     {
@@ -177,30 +196,6 @@ namespace PictureWin
                         e.Handled = false;
                 }
             }
-        }
-
-        private static PageFile StepPrevious(bool fastStep, PagePicture lpCurrent)
-        {
-            PageFile lpfFile = lpCurrent.Previous;
-            if (fastStep)
-            {
-                for (int i = 0; i < 9 && lpfFile.Previous != null; i++)
-                    lpfFile = lpfFile.Previous;
-            }
-
-            return lpfFile;
-        }
-
-        private static PageFile StepNext(bool fastStep, PagePicture lpCurrent)
-        {
-            PageFile lpfFile = lpCurrent.Next;
-            if (fastStep)
-            {
-                for (int i = 0; i < 9 && lpfFile.Next != null; i++)
-                    lpfFile = lpfFile.Next;
-            }
-
-            return lpfFile;
         }
 
         async void OnOrientationChanged(DisplayInformation sender, object args)
@@ -227,14 +222,40 @@ namespace PictureWin
             {
                 PagePicture lpCurrent = (PagePicture)mainImage.Items[0];
                 PageFile lpfFile = null;
+                var up = false;
+
                 if (lpCurrent != null)
                 {
                     var position = e.GetPosition(mainImage);
+                    var height3 = mainImage.ActualHeight/3;
+                    var width2 = mainImage.ActualWidth / 2;
+                    var stepSize = StepSize.small;
 
-                    if (position.X < 50)
-                        lpfFile = StepPrevious((position.X < 25), lpCurrent);
-                    else if (position.X > mainImage.ActualWidth - 75)
-                        lpfFile = StepNext((position.X > mainImage.ActualWidth - 50), lpCurrent);
+                    if (position.X < 50 || position.X > mainImage.ActualWidth - 75)
+                    {
+                        up = position.X > mainImage.ActualWidth - 75;
+                        if (position.Y < height3)
+                            stepSize = StepSize.small;
+                        else if (position.Y < 2 * height3)
+                            stepSize = StepSize.large;
+                        else
+                            stepSize = StepSize.seriesTag;
+                    }
+                    else if (position.Y < 50 || position.Y > mainImage.ActualHeight - 75)
+                    {
+                        up = position.Y > mainImage.ActualHeight - 75;
+                        stepSize = StepSize.series;
+                    }
+                    else
+                    {
+                        e.Handled = false;
+                        return;
+                    }
+
+                    if (up)
+                        lpfFile = lpCurrent.StepNext(stepSize);
+                    else
+                        lpfFile = lpCurrent.StepPrevious(stepSize);
 
                     if (lpfFile != null)
                     {
